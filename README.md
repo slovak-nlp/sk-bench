@@ -4,13 +4,13 @@
 
 `sk-bench` is a specialized benchmarking engine for measuring and refining the performance of Large Language Models (LLMs) in the Slovak language. Powered by the [lighteval](https://github.com/huggingface/lighteval) framework, it provides a robust, reproducible infrastructure for linguistic validation across open-source and closed-source models.
 
-🏆 **[Explore the live sk-bench Leaderboard →](https://huggingface.co/spaces/slovak-nlp/sk-bench-leaderboard?logs=container)**
+🏆 **[Explore the live sk-bench Leaderboard →](https://huggingface.co/spaces/slovak-nlp/sk-bench-leaderboard)**
 
 ## 🚀 Overview
 
 Multilingual LLM benchmarks tend to omit Slovak — a morphologically rich West Slavic language of roughly five million speakers — or cover it only through machine translation, which inherits source-language bias and leaves exploitable translation artifacts in the data. `sk-bench` is a **native-first** Slovak benchmark that addresses this gap: **30 datasets (33 scored task variants) across ten skill categories**, run under a single generate-and-match harness against **55 open- and closed-weights models** to produce zero-shot, identically-prompted, side-by-side Slovak scores.
 
-![Overview of the sk-bench design: ten skill categories and 30 evaluation tasks, with the 12 datasets introduced or first wrapped by sk-bench marked with a star and each task's provenance shown as a native / translated / generated / adapted badge.](images/sk-bench-overview.png)
+![Overview of the sk-bench design: ten skill categories and 30 evaluation tasks, with the 12 datasets introduced or first wrapped by sk-bench marked with a star and each task's provenance shown as a native / translated / generated / adapted badge.](images/sk-bench-overview.svg)
 
 Its organising principle is a **paired provenance contrast**: wherever possible the same skill is measured from native, machine-translated, and LLM-generated data, so provenance can be varied while the skill is held fixed. Twelve of the 30 tasks (40%) did not exist as LLM evaluations before `sk-bench`, including IFEval-SK (verifiable instruction following with re-implemented Slovak checkers) and the Chiby/SKJ1 grammaticality probes — constructs no translated benchmark can produce.
 
@@ -145,15 +145,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for adding tasks, creating prompts, and t
 
 ## 📚 Citation
 
-If you use `sk-bench` in your work, please cite our paper:
+If you use `sk-bench` in your work, please cite our paper ([arXiv:2610.09152](https://arxiv.org/abs/2610.09152)):
 
 ```bibtex
-@inproceedings{suppa2026skbench,
-title={sk-bench: A Native-First Benchmark for Evaluating Large Language Models in Slovak},
-author={{\v{S}}uppa, Marek and Vykopal, Ivan and Ridzik, Andrej and Sopkovi{\v{c}}, Kristi{\'a}n and K{\v{n}}a{\v{z}}ekov{\'a}, Nat{\'a}lia and Kop{\v{c}}an, Jaroslav and Bl{\v{s}}t{\'a}k, Miroslav and Ondrejov{\'a}, Vikt{\'o}ria and Hl{\'a}dek, Daniel and Gregor, Michal and Tamajka, Martin and {\v{S}}imko, Mari{\'a}n},
-booktitle={The 2026 Conference on Empirical Methods in Natural Language Processing},
-year={2026},
-url={https://openreview.net/forum?id=LLfU6QSSEF}
+@misc{šuppa2026skbenchnativefirstbenchmarkevaluating,
+      title={sk-bench: A Native-First Benchmark for Evaluating Large Language Models in Slovak}, 
+      author={Marek Šuppa and Ivan Vykopal and Andrej Ridzik and Kristián Sopkovič and Natália Kňažeková and Jaroslav Kopčan and Miroslav Blšták and Viktória Ondrejová and Daniel Hládek and Michal Gregor and Martin Tamajka and Marián Šimko},
+      year={2026},
+      eprint={2610.09152},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2610.09152}, 
 }
 ```
 
