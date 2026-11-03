@@ -21,6 +21,7 @@ SITE_URL = "https://slovak-nlp.github.io/sk-bench/"
 PAPER = "https://arxiv.org/abs/2610.09152"
 LEADERBOARD = "https://huggingface.co/spaces/slovak-nlp/sk-bench-leaderboard"
 CODE = "https://github.com/slovak-nlp/sk-bench"
+EMNLP = "https://2026.emnlp.org/"
 HF_DATA = "https://huggingface.co/collections/slovak-nlp/sk-bench"
 CONTACT = "marek@suppa.sk"
 
@@ -191,7 +192,7 @@ T = {
         subtitle="sk-bench: súbor testov na hodnotenie veľkých jazykových modelov v slovenčine",
         corr="Korešpondenčný autor",
         btn_paper="Prečítať štúdiu", btn_board="Pozrieť rebríček", btn_code="Kód a dáta", btn_cite="Citovať",
-        venue="Štúdiu sme predstavili na konferencii EMNLP 2026.",
+        venue="Štúdiu sme predstavili na konferencii {emnlp}.",
         ov_h2="Čo sme zistili",
         ov_lead="Zostavili sme prvý veľký súbor testov, ktorý meria, ako umelá inteligencia ovláda slovenčinu, a porovnali v ňom 55 modelov. Najlepšie odpovedajú na otázky z autoškoly či maturity takmer bez chyby. Pri úlohách typických pre slovenčinu však ešte zaostávajú a otvorené modely sú stále výrazne za komerčnými.",
         cards=[
@@ -311,7 +312,7 @@ T = {
         subtitle="sk-bench: A Native-First Benchmark for Evaluating Large Language Models in Slovak",
         corr="Corresponding author",
         btn_paper="Read the paper", btn_board="See the leaderboard", btn_code="Code and data", btn_cite="Cite",
-        venue="The paper was presented at EMNLP 2026.",
+        venue="The paper was presented at {emnlp}.",
         ov_h2="What we found",
         ov_lead="We built the first large benchmark of how well AI handles the Slovak language and compared 55 models on it. The best ones answer driving-test and school-exam questions almost perfectly. Tasks typical of Slovak still trip them up, and open models remain well behind commercial ones.",
         cards=[
@@ -790,6 +791,7 @@ h4 { font-size: 1.05rem; }
 .btn.small { padding: .35rem .85rem; font-size: .86rem; }
 .btn svg { width: 1em; height: 1em; }
 .venue { font: .9rem var(--sans); color: var(--muted); margin: 1.1rem auto 0; }
+.venue a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 2px; }
 
 /* Sections */
 section.block { padding: 4rem 0; border-top: 1px solid var(--rule); }
@@ -1220,7 +1222,7 @@ def page(lang: str) -> str:
     <a class="btn" href="{CODE}">{e(t["btn_code"])}</a>
     <a class="btn" href="#{c_id}">{e(t["btn_cite"])}</a>
   </div>
-  <p class="venue">{e(t["venue"])}</p>
+  <p class="venue">{e(t["venue"]).replace("{emnlp}", f'<a href="{EMNLP}">EMNLP 2026</a>')}</p>
 </div>
 
 <section class="block band" id="{ov_id}" aria-labelledby="{ov_id}-h"><div class="wrap">
