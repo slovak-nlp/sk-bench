@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sk-bench: how well does AI understand Slovak</title>
+<meta name="description" content="sk-bench measures how well language models handle Slovak. Results on the Slovak driving test, the NBS financial exam, the maturita, and the tasks where AI still falls short.">
+<link rel="canonical" href="https://slovak-nlp.github.io/sk-bench/en/">
+<link rel="alternate" hreflang="sk" href="https://slovak-nlp.github.io/sk-bench/">
+<link rel="alternate" hreflang="en" href="https://slovak-nlp.github.io/sk-bench/en/">
+<meta property="og:title" content="How well does AI understand Slovak?">
+<meta property="og:description" content="sk-bench measures how well language models handle Slovak. Results on the Slovak driving test, the NBS financial exam, the maturita, and the tasks where AI still falls short.">
+<meta property="og:url" content="https://slovak-nlp.github.io/sk-bench/en/">
+<meta property="og:type" content="website">
+<meta name="citation_title" content="sk-bench: A Native-First Benchmark for Evaluating Large Language Models in Slovak">
+<meta name="citation_author" content="Marek Šuppa"><meta name="citation_author" content="Ivan Vykopal"><meta name="citation_author" content="Andrej Ridzik"><meta name="citation_author" content="Kristián Sopkovič"><meta name="citation_author" content="Natália Kňažeková"><meta name="citation_author" content="Jaroslav Kopčan"><meta name="citation_author" content="Miroslav Blšták"><meta name="citation_author" content="Viktória Ondrejová"><meta name="citation_author" content="Daniel Hládek"><meta name="citation_author" content="Michal Gregor"><meta name="citation_author" content="Martin Tamajka"><meta name="citation_author" content="Marián Šimko">
+<meta name="citation_publication_date" content="2026">
+<meta name="citation_arxiv_id" content="2610.09152">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2315203A'/%3E%3Cpath d='M8 17l5 5 11-12' stroke='%23FF7B70' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preload" href="../fonts/schibsted-grotesk-normal-latin-3.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+:root {
+  --page: #F4F6FA; --sheet: #FFFFFF; --ink: #15203A; --muted: #56627A; --rule: #D5DCE7;
+  --grid: #E3EAF4; --margin-line: #F0B7B2; --blue: #1F4FD1; --red: #D3302F;
+  --blue-soft: #E8EEFC; --red-soft: #FCEBE9;
+  --sans: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Source Serif 4", Georgia, serif;
+  --hand: "Caveat", "Comic Sans MS", cursive;
+  --margin: 2.75rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0D1320; --sheet: #141C2C; --ink: #E7ECF4; --muted: #9AA6BA; --rule: #2A3549;
+    --grid: #1B2537; --margin-line: #5C2B2E; --blue: #85A5FF; --red: #FF7B70;
+    --blue-soft: #1C2944; --red-soft: #3A1F22;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #0D1320; --sheet: #141C2C; --ink: #E7ECF4; --muted: #9AA6BA; --rule: #2A3549;
+  --grid: #1B2537; --margin-line: #5C2B2E; --blue: #85A5FF; --red: #FF7B70;
+  --blue-soft: #1C2944; --red-soft: #3A1F22;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 400 1.0625rem/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--blue); text-underline-offset: .18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 3px; }
+.wrap { max-width: 68rem; margin: 0 auto; padding: 0 1.25rem; }
+.narrow { max-width: 44rem; }
+p { margin: .85rem 0; max-width: 64ch; }
+h1, h2, h3 { margin: 0; line-height: 1.1; letter-spacing: -.02em; }
+h2 { font-size: clamp(1.7rem, 3.4vw, 2.3rem); font-weight: 750; }
+h3 { font-size: 1.15rem; font-weight: 650; letter-spacing: -.01em; }
+.pen { font-family: var(--hand); color: var(--red); font-weight: 600; letter-spacing: 0; }
+
+/* Header */
+.bar-top { display: flex; align-items: center; gap: 1.5rem; padding: 1.1rem 0; }
+.brand { font-weight: 800; font-size: 1.2rem; letter-spacing: -.03em; color: var(--ink); text-decoration: none; }
+.bar-top nav { margin-left: auto; display: flex; gap: 1.4rem; font-size: .95rem; font-weight: 500; }
+.bar-top nav a { color: var(--muted); text-decoration: none; }
+.bar-top nav a:hover { color: var(--ink); }
+.bar-top .lang { color: var(--ink); border: 1px solid var(--rule); border-radius: 999px; padding: .1rem .7rem; }
+@media (max-width: 44rem) { .bar-top nav a:not(.lang) { display: none; } }
+
+/* Hero */
+.hero { display: grid; gap: 3rem; align-items: center; padding: 3rem 0 4.5rem; }
+@media (min-width: 60rem) { .hero { grid-template-columns: 1.05fr .95fr; gap: 4rem; padding-top: 4rem; } }
+h1 { font-size: clamp(2.5rem, 6vw, 4.1rem); font-weight: 800; letter-spacing: -.035em; line-height: 1.02; max-width: 13ch; }
+.lead { font-size: 1.2rem; line-height: 1.55; margin-top: 1.5rem; }
+.venue { color: var(--muted); font-size: .95rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.6rem; }
+.btn { display: inline-block; padding: .6rem 1.05rem; border-radius: 6px; font-weight: 600; font-size: .98rem; text-decoration: none; border: 1.5px solid var(--ink); color: var(--ink); }
+.btn:hover { background: var(--sheet); }
+.btn.primary { background: var(--ink); color: var(--page); }
+.btn.primary:hover { background: var(--blue); border-color: var(--blue); }
+figure { margin: 0; }
+.hero figcaption { font-size: .92rem; color: var(--muted); margin: 1.1rem .25rem 0; max-width: 46ch; }
+
+/* Squared exam paper with a red margin line */
+.paper {
+  background-color: var(--sheet);
+  background-image:
+    linear-gradient(90deg, transparent calc(var(--margin) - 2px), var(--margin-line) calc(var(--margin) - 2px), var(--margin-line) var(--margin), transparent var(--margin)),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 100% 100%, 1.25rem 1.25rem, 1.25rem 1.25rem;
+  background-position: 0 0, -1px -1px, -1px -1px;
+  border: 1px solid var(--rule); border-radius: 4px;
+  padding: 1.25rem 1.4rem 1.3rem calc(var(--margin) + 1.1rem);
+}
+.hero-sheet { padding-top: 1.4rem; padding-bottom: 1.6rem; box-shadow: 0 1px 0 rgba(21,32,58,.05), 0 24px 48px -26px rgba(21,32,58,.45); }
+@media (min-width: 60rem) { .hero-sheet { transform: rotate(-1.1deg); } }
+.sheet-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; font-size: .9rem; color: var(--muted); font-weight: 500; }
+.sheet-head .hint { font-size: 1.45rem; transform: rotate(-3deg); }
+
+/* Questions */
+.q-src { font-size: .88rem; color: var(--muted); margin: 0 0 .35rem; font-weight: 500; }
+.q-text { font-family: var(--serif); font-size: 1.28rem; line-height: 1.35; font-weight: 600; margin: .5rem 0 0; max-width: none; }
+.hero-sheet .q-text { font-size: clamp(1.3rem, 2.4vw, 1.6rem); }
+.q-tr { font-family: var(--serif); font-style: italic; color: var(--muted); margin: .3rem 0 0; font-size: 1rem; }
+.opts { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .45rem; }
+.opts button {
+  position: relative; width: 100%; text-align: left; font: 400 1.05rem/1.4 var(--serif); color: var(--ink);
+  cursor: pointer; background: color-mix(in srgb, var(--sheet) 90%, transparent);
+  border: 1px solid var(--rule); border-radius: 5px; padding: .6rem .8rem; display: flex; gap: .65rem; align-items: baseline;
+}
+.opts button:hover { border-color: var(--ink); }
+.opts button b { font-family: var(--sans); font-weight: 650; font-size: .95rem; min-width: 1.2rem; }
+.opts small { display: block; font-style: italic; color: var(--muted); font-size: .9rem; margin-top: .15rem; }
+.q[data-done] button { cursor: default; }
+.q[data-done] button:hover { border-color: var(--rule); }
+.opts button.is-wrong > span { text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 2px; color: var(--muted); }
+.opts button.is-right { border-color: transparent; background: var(--sheet); }
+.opts button.is-right::after {
+  content: ""; position: absolute; inset: -5px -7px -4px -6px; pointer-events: none;
+  border: 2.5px solid var(--red); border-radius: 48% 52% 46% 54% / 60% 44% 56% 40%;
+  transform: rotate(-.8deg); animation: draw .45s ease-out both;
+}
+@keyframes draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.verdict { margin: .9rem 0 0; font-size: .95rem; color: var(--muted); }
+.verdict:empty { display: none; }
+.verdict .pen { font-size: 1.6rem; line-height: 1; margin-right: .5rem; display: inline-block; transform: rotate(-2deg); }
+.quiz { display: grid; gap: 1.25rem; margin-top: 1.75rem; align-items: start; }
+@media (min-width: 52rem) { .quiz { grid-template-columns: 1fr 1fr; } }
+
+/* Sections */
+section.block { padding: 4.5rem 0; border-top: 1px solid var(--rule); }
+.intro { color: var(--muted); font-size: 1.08rem; }
+
+/* Results chart */
+.chart { background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; padding: 1.4rem 1.5rem 1.2rem; margin-top: 2rem; }
+.legend { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; font-size: .9rem; color: var(--muted); margin: 0 0 .5rem; }
+.legend span { display: inline-flex; align-items: center; gap: .45rem; }
+.legend .dot { position: static; transform: none; }
+.legend .swatch-pass { width: 2px; height: 1rem; background: var(--red); }
+.row { padding: 1.15rem 0 1rem; border-top: 1px solid var(--rule); }
+.legend + .row { border-top: 0; }
+.row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.row-head .top { color: var(--muted); font-size: .92rem; white-space: nowrap; }
+.row-head .top b { color: var(--ink); font-size: 1.05rem; }
+.track { position: relative; height: 2.6rem; margin: 1.1rem 0 .25rem; }
+.track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--rule); }
+.tick { position: absolute; top: 50%; height: .55rem; border-left: 1px solid var(--rule); transform: translateY(-50%); }
+.pass { position: absolute; top: -.2rem; bottom: 0; border-left: 2px solid var(--red); }
+.pass span { position: absolute; right: .55rem; top: -1rem; font-size: 1.4rem; line-height: 1; white-space: nowrap; transform: rotate(-1.5deg); }
+.dot { position: absolute; top: 50%; width: .95rem; height: .95rem; transform: translate(-50%, -50%); display: inline-block; }
+.d-gem { background: var(--ink); border-radius: 50%; }
+.d-gpt { border: 2.5px solid var(--ink); border-radius: 50%; z-index: 1; width: 1.25rem; height: 1.25rem; }
+.legend .d-gpt { width: .95rem; height: .95rem; }
+.d-open { background: var(--blue); border-radius: 2px; }
+.note { font-size: .9rem; color: var(--muted); margin: 0; max-width: none; }
+.group-label { margin: 1.6rem 0 0; padding-top: 1rem; border-top: 2px solid var(--ink); font-weight: 700; font-size: 1.05rem; max-width: none; }
+.group-label + .row { border-top: 0; padding-top: .6rem; }
+.axis { position: relative; height: 1.3rem; font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: .3rem; }
+.axis span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.axis span:first-child { transform: none; }
+.axis span:last-child { transform: translateX(-100%); }
+.chart .small { font-size: .88rem; color: var(--muted); margin: .9rem 0 0; }
+
+/* Commercial vs open */
+.split { display: grid; gap: 2.5rem; margin-top: 1.5rem; }
+@media (min-width: 60rem) { .split { grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; } }
+.bars { margin-bottom: 1.8rem; }
+.bars-title { font-weight: 650; margin: 0 0 .7rem; }
+.bar { display: grid; grid-template-columns: 1fr auto; gap: .2rem .8rem; margin-bottom: .75rem; }
+.bar-label { font-size: .92rem; color: var(--muted); }
+.bar-val { grid-row: 1 / 3; grid-column: 2; align-self: end; font-weight: 700; font-size: 1.25rem; min-width: 4.2rem; text-align: right; }
+.bar-track { height: .8rem; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.bar-track i { display: block; height: 100%; }
+.b-com { background: var(--ink); }
+.b-open { background: var(--blue); }
+
+/* Research */
+.overview { background: #fff; border: 1px solid var(--rule); border-radius: 4px; padding: .75rem; margin: 2rem 0 0; }
+.overview img { display: block; width: 100%; height: auto; }
+.overview figcaption { font-size: .88rem; color: var(--muted); margin: .7rem .25rem .1rem; max-width: none; }
+.cols { display: grid; gap: 2.5rem; margin-top: 2.5rem; }
+.cols > div, .split > div, .hero > * { min-width: 0; }
+@media (min-width: 60rem) { .cols { grid-template-columns: 1fr 1.4fr; gap: 3.5rem; } }
+.authors { list-style: none; padding: 0; margin: .8rem 0 0; columns: 2; column-gap: 1.5rem; font-size: .98rem; }
+.authors li { padding: .12rem 0; break-inside: avoid; }
+.links { list-style: none; padding: 0; margin: 1.4rem 0 0; display: grid; gap: .35rem; }
+.cite-head { display: flex; justify-content: space-between; align-items: center; }
+.copy { font: 600 .88rem var(--sans); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule); border-radius: 5px; padding: .3rem .75rem; cursor: pointer; }
+.copy:hover { border-color: var(--ink); }
+pre.bib { margin: .8rem 0 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; padding: 1rem 1.1rem; font: .8rem/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-x: auto; white-space: pre; }
+
+footer { border-top: 1px solid var(--rule); padding: 2rem 0 3rem; font-size: .9rem; color: var(--muted); }
+footer p { max-width: 80ch; }
+
+@media (max-width: 40rem) {
+  :root { --margin: 1.6rem; }
+  .paper { padding-right: 1rem; }
+  .row-head { flex-direction: column; gap: .15rem; }
+  .chart { padding: 1.1rem 1rem 1rem; }
+  .pass span { font-size: 1.25rem; }
+  .authors { columns: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .opts button.is-right::after { animation: none; }
+}
+</style>
+</head>
+<body data-right="Correct!" data-wrong="The answer is {x})">
+<div class="wrap">
+  <header class="bar-top"><a class="brand" href="./">sk-bench</a><nav><a href="#results">Results</a><a href="#questions">Questions</a><a href="#research">For researchers</a><a class="lang" href="../" hreflang="sk" lang="sk">Slovensky</a></nav></header>
+
+  <div class="hero">
+    <div>
+      <h1>How well does AI understand Slovak?</h1>
+      <p class="lead">sk-bench is the first large benchmark of how well AI handles the Slovak language. It has 30 tasks across ten areas, and most of them were written in Slovak rather than translated. In the paper we compare 55 models.</p>
+      <p>The best models answer driving-test and school-exam questions almost perfectly. Some Slovak tasks still trip them up.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://arxiv.org/abs/2610.09152">Read the paper</a>
+        <a class="btn" href="https://huggingface.co/spaces/slovak-nlp/sk-bench-leaderboard">Model leaderboard</a>
+        <a class="btn" href="https://github.com/slovak-nlp/sk-bench">Code and data</a>
+      </div>
+      <p class="venue">The paper will be presented at EMNLP 2026.</p>
+    </div>
+    <figure>
+      <article class="q paper hero-sheet" data-a="1" data-stat=""><div class="sheet-head"><span>Slovak driving test</span><span class="pen hint" aria-hidden="true">Have a go</span></div><p class="q-text" lang="sk">Musí byť vozidlo stojace za zníženej viditeľnosti na parkovisku osvetlené?</p><p class="q-tr" lang="en">Must a vehicle parked in a car park be lit when visibility is reduced?</p><ol class="opts"><li><button type="button" data-i="0"><b>a)</b><span><span lang="sk">Áno, vždy musí byť osvetlené aspoň parkovacími svietidlami.</span><small lang="en">Yes, it must always have at least its parking lights on.</small></span></button></li><li><button type="button" data-i="1"><b>b)</b><span><span lang="sk">Nie, nemusí byť osvetlené.</span><small lang="en">No, it does not need to be lit.</small></span></button></li><li><button type="button" data-i="2"><b>c)</b><span><span lang="sk">Áno, ale len ak parkovisko nie je verejne osvetlené.</span><small lang="en">Yes, but only if the car park has no public lighting.</small></span></button></li></ol><p class="verdict" aria-live="polite"></p></article>
+      <figcaption>The best model, Gemini 3.1 Pro, answered 98.3% of the 701 driving-test questions correctly.</figcaption>
+    </figure>
+  </div>
+
+  <section class="block" id="results" aria-labelledby="results-h">
+    <h2 id="results-h">How many questions the models got right</h2>
+    <p class="intro">We compare the two best commercial models with the best open model. The red line shows what a person needs to pass.</p>
+    <div class="chart">
+      <p class="legend" aria-hidden="true">
+        <span><i class="dot d-gem"></i>Gemini 3.1 Pro</span>
+        <span><i class="dot d-gpt"></i>GPT-5.5</span>
+        <span><i class="dot d-open"></i>best open model</span>
+        <span><i class="swatch-pass"></i>pass mark</span>
+      </p>
+      <div class="row"><div class="row-head"><h3>Driving test</h3><span class="top">best model <b>98.3%</b></span></div><div class="track" role="img" aria-label="Driving test: Gemini 3.1 Pro 98.3%, GPT-5.5 96.1%, best open model Gemma 4 31B 89.9%, pass mark 90.0%"><i class="tick" style="left:20.00%"></i><i class="tick" style="left:40.00%"></i><i class="tick" style="left:60.00%"></i><i class="tick" style="left:80.00%"></i><i class="pass" style="left:80.00%"><span class="pen">a licence needs 90 of 100 points</span></i><i class="dot d-open" style="left:79.80%"></i><i class="dot d-gpt" style="left:92.20%"></i><i class="dot d-gem" style="left:96.60%"></i></div><p class="note">701 questions. Best open model: Gemma 4 31B, 89.9%.</p></div><div class="row"><div class="row-head"><h3>NBS financial services exam</h3><span class="top">best model <b>96.3%</b></span></div><div class="track" role="img" aria-label="NBS financial services exam: Gemini 3.1 Pro 96.3%, GPT-5.5 96.0%, best open model Qwen3.5 397B 87.8%, pass mark 80.0%"><i class="tick" style="left:20.00%"></i><i class="tick" style="left:40.00%"></i><i class="tick" style="left:60.00%"></i><i class="tick" style="left:80.00%"></i><i class="pass" style="left:60.00%"><span class="pen">a pass needs 24 of 30</span></i><i class="dot d-open" style="left:75.60%"></i><i class="dot d-gpt" style="left:92.00%"></i><i class="dot d-gem" style="left:92.60%"></i></div><p class="note">1,334 questions. Best open model: Qwen3.5 397B, 87.8%.</p></div><div class="row"><div class="row-head"><h3>Maturita in Slovak language</h3><span class="top">best model <b>94.8%</b></span></div><div class="track" role="img" aria-label="Maturita in Slovak language: Gemini 3.1 Pro 94.8%, GPT-5.5 92.9%, best open model Gemma 4 31B 86.5%"><i class="tick" style="left:20.00%"></i><i class="tick" style="left:40.00%"></i><i class="tick" style="left:60.00%"></i><i class="tick" style="left:80.00%"></i><i class="dot d-open" style="left:73.00%"></i><i class="dot d-gpt" style="left:85.80%"></i><i class="dot d-gem" style="left:89.60%"></i></div><p class="note">369 multiple-choice questions. Best open model: Gemma 4 31B, 86.5%.</p></div><p class="group-label">Where AI still falls short</p><div class="row"><div class="row-head"><h3>Questions about Slovakia</h3><span class="top">best model <b>94.3%</b></span></div><div class="track" role="img" aria-label="Questions about Slovakia: Gemini 3.1 Pro 94.3%, GPT-5.5 92.4%, best open model Qwen3.5 397B 68.7%"><i class="tick" style="left:20.00%"></i><i class="tick" style="left:40.00%"></i><i class="tick" style="left:60.00%"></i><i class="tick" style="left:80.00%"></i><i class="dot d-open" style="left:37.40%"></i><i class="dot d-gpt" style="left:84.80%"></i><i class="dot d-gem" style="left:88.60%"></i></div><p class="note">geography, history, culture. Best open model: Qwen3.5 397B, 68.7%.</p></div><div class="row"><div class="row-head"><h3>Spelling and diacritics errors</h3><span class="top">best model <b>74.5%</b></span></div><div class="track" role="img" aria-label="Spelling and diacritics errors: Gemini 3.1 Pro 74.4%, GPT-5.5 74.5%, best open model Qwen3.5 397B 72.2%"><i class="tick" style="left:20.00%"></i><i class="tick" style="left:40.00%"></i><i class="tick" style="left:60.00%"></i><i class="tick" style="left:80.00%"></i><i class="dot d-open" style="left:44.40%"></i><i class="dot d-gpt" style="left:49.00%"></i><i class="dot d-gem" style="left:48.80%"></i></div><p class="note">the model says whether a sentence is error-free. Best open model: Qwen3.5 397B, 72.2%. The best score of any model is 75.0%.</p></div><div class="axis" aria-hidden="true"><span style="left:0.00%">50%</span><span style="left:20.00%">60%</span><span style="left:40.00%">70%</span><span style="left:60.00%">80%</span><span style="left:80.00%">90%</span><span style="left:100.00%">100%</span></div>
+      <p class="small">The axis starts at 50%. Every model saw each task in three Slovak phrasings, and we report the mean.</p>
+    </div>
+  </section>
+
+  <section class="block" id="questions" aria-labelledby="questions-h">
+    <div class="narrow">
+      <h2 id="questions-h">Try more questions</h2>
+      <p class="intro">Five real questions from the tests, shown in the original Slovak with an English translation. Click the answer you think is right.</p>
+    </div>
+    <div class="quiz"><article class="q paper" data-a="0" data-stat="The best model gets 98.3% of driving-test questions right."><p class="q-src">Driving test</p><p class="q-text" lang="sk">Pri uzatvorenom chladiacom systéme chladiaca kvapalina vrie</p><p class="q-tr" lang="en">In a sealed cooling system, the coolant boils</p><ol class="opts"><li><button type="button" data-i="0"><b>a)</b><span><span lang="sk">približne pri 110 °C.</span><small lang="en">at about 110 °C.</small></span></button></li><li><button type="button" data-i="1"><b>b)</b><span><span lang="sk">presne pri 100 °C.</span><small lang="en">at exactly 100 °C.</small></span></button></li><li><button type="button" data-i="2"><b>c)</b><span><span lang="sk">až pri 150 °C.</span><small lang="en">only at 150 °C.</small></span></button></li></ol><p class="verdict" aria-live="polite"></p></article><article class="q paper" data-a="1" data-stat="The best model gets 96.3% of financial-exam questions right."><p class="q-src">NBS financial exam</p><p class="q-text" lang="sk">K nadobudnutiu vlastníckeho práva k nehnuteľnosti dochádza</p><p class="q-tr" lang="en">Ownership of real estate is acquired</p><ol class="opts"><li><button type="button" data-i="0"><b>a)</b><span><span lang="sk">nadobudnutím platnosti kúpnej alebo inej zmluvy</span><small lang="en">when the purchase or other contract becomes valid</small></span></button></li><li><button type="button" data-i="1"><b>b)</b><span><span lang="sk">vkladom do katastra nehnuteľností podľa osobitného predpisu</span><small lang="en">by registration in the land register under a special regulation</small></span></button></li><li><button type="button" data-i="2"><b>c)</b><span><span lang="sk">podpisom kúpnej alebo inej zmluvy</span><small lang="en">by signing the purchase or other contract</small></span></button></li><li><button type="button" data-i="3"><b>d)</b><span><span lang="sk">podpisom kúpnej alebo inej zmluvy s overením podpisov kupujúceho aj predávajúceho pred notárom</span><small lang="en">by signing the contract with both signatures certified by a notary</small></span></button></li><li><button type="button" data-i="4"><b>e)</b><span><span lang="sk">spísaním notárskej zápisnice o zmluve o prevode nehnuteľnosti</span><small lang="en">by drawing up a notarial record of the transfer contract</small></span></button></li></ol><p class="verdict" aria-live="polite"></p></article><article class="q paper" data-a="3" data-stat="The best model gets 96.3% of financial-exam questions right."><p class="q-src">NBS financial exam</p><p class="q-text" lang="sk">Blízkou osobou v priamom rade je</p><p class="q-tr" lang="en">A close relative in the direct line is</p><ol class="opts"><li><button type="button" data-i="0"><b>a)</b><span><span lang="sk">bratranec</span><small lang="en">a cousin</small></span></button></li><li><button type="button" data-i="1"><b>b)</b><span><span lang="sk">otcov brat</span><small lang="en">an uncle on the father&#x27;s side</small></span></button></li><li><button type="button" data-i="2"><b>c)</b><span><span lang="sk">druh/družka</span><small lang="en">an unmarried partner</small></span></button></li><li><button type="button" data-i="3"><b>d)</b><span><span lang="sk">syn</span><small lang="en">a son</small></span></button></li><li><button type="button" data-i="4"><b>e)</b><span><span lang="sk">neter</span><small lang="en">a niece</small></span></button></li></ol><p class="verdict" aria-live="polite"></p></article><article class="q paper" data-a="2" data-stat="The best model gets 94.8% of maturita questions right."><p class="q-src">Maturita in Slovak, 2024</p><p class="q-text" lang="sk">Taliančina patrí do rovnakej jazykovej skupiny indoeurópskych jazykov ako</p><p class="q-tr" lang="en">Italian belongs to the same group of Indo-European languages as</p><ol class="opts"><li><button type="button" data-i="0"><b>a)</b><span><span lang="sk">dánčina.</span><small lang="en">Danish.</small></span></button></li><li><button type="button" data-i="1"><b>b)</b><span><span lang="sk">nemčina.</span><small lang="en">German.</small></span></button></li><li><button type="button" data-i="2"><b>c)</b><span><span lang="sk">rumunčina.</span><small lang="en">Romanian.</small></span></button></li><li><button type="button" data-i="3"><b>d)</b><span><span lang="sk">bulharčina.</span><small lang="en">Bulgarian.</small></span></button></li></ol><p class="verdict" aria-live="polite"></p></article><article class="q paper" data-a="3" data-stat="The best model gets 94.8% of maturita questions right."><p class="q-src">Maturita in Slovak, 2024</p><p class="q-text" lang="sk">V ktorej možnosti sa nachádza vokalizovaná predložka?</p><p class="q-tr" lang="en">Which option contains a vocalized preposition (one with an added vowel, such as s becoming so)?</p><ol class="opts"><li><button type="button" data-i="0"><b>a)</b><span><span lang="sk">za kladné vybavenie</span></span></button></li><li><button type="button" data-i="1"><b>b)</b><span><span lang="sk">na osobnom pohovore</span></span></button></li><li><button type="button" data-i="2"><b>c)</b><span><span lang="sk">dorozumiem sa aj po maďarsky</span></span></button></li><li><button type="button" data-i="3"><b>d)</b><span><span lang="sk">skúsenosti so spoluorganizovaním</span></span></button></li></ol><p class="verdict" aria-live="polite"></p></article></div>
+  </section>
+
+  <section class="block" aria-labelledby="open-h">
+    <h2 id="open-h">Commercial and open models</h2>
+    <div class="split">
+      <div>
+        <p>Commercial models such as Gemini or GPT run only on their makers&#x27; servers. An open model can be downloaded and run on its own server by a company, a hospital or a public office.</p>
+        <p>All of the top open models come from outside Slovakia. If we want AI that understands Slovak well and keeps data in Slovakia, we need open models that handle Slovak at the top level.</p>
+        <p>We keep adding new models to the <a href="https://huggingface.co/spaces/slovak-nlp/sk-bench-leaderboard">leaderboard</a>, so its numbers can differ from the paper.</p>
+      </div>
+      <div><div class="bars"><p class="bars-title">Overall score in the paper, out of 100</p><div class="bar"><span class="bar-label">best commercial model (Gemini 3.1 Pro)</span><span class="bar-track"><i class="b-com" style="width:72.6%"></i></span><span class="bar-val">72.6</span></div><div class="bar"><span class="bar-label">best open model</span><span class="bar-track"><i class="b-open" style="width:60.0%"></i></span><span class="bar-val">60.0</span></div></div><div class="bars"><p class="bars-title">Questions about Slovakia, percent correct</p><div class="bar"><span class="bar-label">best commercial model (Gemini 3.1 Pro)</span><span class="bar-track"><i class="b-com" style="width:94.3%"></i></span><span class="bar-val">94.3%</span></div><div class="bar"><span class="bar-label">best open model (Qwen3.5 397B)</span><span class="bar-track"><i class="b-open" style="width:68.7%"></i></span><span class="bar-val">68.7%</span></div></div></div>
+    </div>
+  </section>
+
+  <section class="block" id="research" aria-labelledby="research-h">
+    <h2 id="research-h">For researchers</h2>
+    <p>sk-bench has 30 datasets in ten skill categories, from classification and reading comprehension to grammar, knowledge, summarisation and instruction following. Wherever we could, we used native Slovak data rather than translations. Several datasets are new or used to evaluate language models for the first time, including IFEval-SK and the Chiby and SKJ1 grammar probes.</p>
+    <p>Every model gets the same prompts through a single lighteval pipeline, so open and commercial models are scored the same way.</p>
+    <figure class="overview">
+      <img src="../sk-bench-overview.svg" alt="The ten skill categories and 30 tasks of sk-bench. A star marks new datasets, and each task&#x27;s badge shows whether its data is native, translated, generated or adapted. Figure from the paper." width="885" height="288" loading="lazy">
+      <figcaption>The ten skill categories and 30 tasks of sk-bench. A star marks new datasets, and each task&#x27;s badge shows whether its data is native, translated, generated or adapted. Figure from the paper.</figcaption>
+    </figure>
+    <div class="cols">
+      <div>
+        <h3>Authors</h3>
+        <ul class="authors"><li>Marek Šuppa</li><li>Ivan Vykopal</li><li>Andrej Ridzik</li><li>Kristián Sopkovič</li><li>Natália Kňažeková</li><li>Jaroslav Kopčan</li><li>Miroslav Blšták</li><li>Viktória Ondrejová</li><li>Daniel Hládek</li><li>Michal Gregor</li><li>Martin Tamajka</li><li>Marián Šimko</li></ul>
+        <ul class="links"><li><a href="https://arxiv.org/abs/2610.09152">Paper on arXiv</a></li><li><a href="https://huggingface.co/spaces/slovak-nlp/sk-bench-leaderboard">Leaderboard on Hugging Face</a></li><li><a href="https://github.com/slovak-nlp/sk-bench">Code on GitHub</a></li></ul>
+      </div>
+      <div>
+        <div class="cite-head"><h3>Cite</h3><button class="copy" type="button" data-done="Copied">Copy</button></div>
+        <pre class="bib">@misc{suppa2026skbench,
+  title         = {sk-bench: A Native-First Benchmark for Evaluating Large Language Models in Slovak},
+  author        = {Marek Šuppa and Ivan Vykopal and Andrej Ridzik and Kristián Sopkovič and Natália Kňažeková and Jaroslav Kopčan and Miroslav Blšták and Viktória Ondrejová and Daniel Hládek and Michal Gregor and Martin Tamajka and Marián Šimko},
+  year          = {2026},
+  eprint        = {2610.09152},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2610.09152}
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>sk-bench was built by researchers from the Kempelen Institute of Intelligent Technologies (KInIT), Comenius University in Bratislava, the Technical University of Košice and other partners.</p>
+    <p>The questions on this page come from <a href="https://huggingface.co/datasets/slovak-nlp/driving-test-dataset-slovak">driving-test-dataset-slovak</a> (CC BY 4.0), <a href="https://huggingface.co/datasets/TUKE-KEMT/slovak-financial-exam">slovak-financial-exam</a> by TUKE KEMT (CC BY-SA 4.0) and <a href="https://huggingface.co/datasets/slovak-nlp/slovak-school-exams-test-preprocessed">slovak-school-exams</a> (CC BY 4.0). As of 3 November 2026.</p>
+  </footer>
+</div>
+<script>
+const body = document.body;
+document.querySelectorAll('.q').forEach(box => {
+  box.addEventListener('click', ev => {
+    const btn = ev.target.closest('button');
+    if (!btn || box.dataset.done) return;
+    box.dataset.done = '1';
+    const a = +box.dataset.a, i = +btn.dataset.i;
+    const buttons = box.querySelectorAll('button');
+    buttons[a].classList.add('is-right');
+    if (i !== a) btn.classList.add('is-wrong');
+    buttons.forEach(b => b.setAttribute('aria-disabled', 'true'));
+    const v = box.querySelector('.verdict');
+    const pen = document.createElement('span');
+    pen.className = 'pen';
+    pen.textContent = i === a ? body.dataset.right : body.dataset.wrong.replace('{x}', 'abcde'[a]);
+    v.append(pen, document.createTextNode(box.dataset.stat || ''));
+  });
+});
+const copy = document.querySelector('.copy');
+if (copy) copy.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(document.querySelector('pre.bib').textContent);
+    const label = copy.textContent;
+    copy.textContent = copy.dataset.done;
+    setTimeout(() => { copy.textContent = label; }, 1600);
+  } catch (err) {
+    const r = document.createRange(); r.selectNodeContents(document.querySelector('pre.bib'));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  }
+});
+</script>
+</body>
+</html>
