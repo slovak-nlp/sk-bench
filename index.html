@@ -38,7 +38,12 @@ body {
   margin: 0; background: var(--paper); color: var(--ink);
   font: 400 1rem/1.55 var(--sans);
 }
-main { max-width: 46rem; margin: 0 auto; padding: 3rem 1rem 4rem; }
+main { max-width: 46rem; margin: 0 auto; padding: 1.25rem 1rem 4rem; }
+.masthead { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; padding-bottom: 0.9rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--rule); font-size: 0.9rem; }
+.masthead b { font-family: var(--serif); font-size: 1.05rem; }
+.masthead nav { display: flex; gap: 1.1rem; }
+.masthead nav a { color: var(--muted); text-decoration: none; }
+.masthead nav a:hover { color: var(--pencil); text-decoration: underline; }
 h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.2; margin: 0; }
 h1 { font-size: clamp(2rem, 6vw, 2.9rem); letter-spacing: -0.01em; max-width: 18ch; }
 h2 { font-size: 1.6rem; margin-top: 3.5rem; }
@@ -74,10 +79,10 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--pencil); outlin
 .axis span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
 .axis span:first-child { transform: none; }
 .axis span:last-child { transform: translateX(-100%); }
-.group-label { max-width: none; font-family: var(--serif); font-style: italic; color: var(--muted); margin: 1.4rem 0 0; padding-top: 0.8rem; border-top: 2px solid var(--ink); }
+.group-label { max-width: none; font-family: var(--serif); font-style: italic; color: var(--muted); margin: 1.4rem 0 0; padding-top: 0.8rem; border-top: 1px solid var(--muted); }
 
 /* Questions */
-.q { background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; padding: 1.1rem 1.25rem; margin-top: 1rem; }
+.q { background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; padding: 1rem 1.25rem 1.1rem; margin-top: 0.75rem; }
 .q-src { font-size: 0.8rem; color: var(--muted); margin: 0 0 0.4rem; }
 .q h3 { font-size: 1.12rem; font-weight: 600; }
 .q ol { list-style: none; padding: 0; margin: 0.8rem 0 0; display: grid; gap: 0.4rem; }
@@ -91,7 +96,8 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--pencil); outlin
 .q[data-done] button { cursor: default; }
 .q button.is-right { background: var(--ok-bg); border-color: var(--pencil); }
 .q button.is-wrong { background: var(--bad-bg); border-color: var(--pen); text-decoration: line-through; text-decoration-color: var(--pen); }
-.q .verdict { margin: 0.7rem 0 0; font-size: 0.9rem; min-height: 1.4em; }
+.q .verdict { margin: 0.7rem 0 0; font-size: 0.9rem; }
+.q .verdict:empty { display: none; }
 
 ul.links { padding-left: 1.1rem; }
 ul.links li { margin: 0.3rem 0; }
@@ -103,9 +109,10 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--rule
 </head>
 <body>
 <main>
+  <header class="masthead"><b>sk-bench</b><nav><a href="https://arxiv.org/abs/2610.09152">Štúdia</a><a href="https://huggingface.co/spaces/slovak-nlp/sk-bench-leaderboard">Rebríček</a><a href="https://github.com/slovak-nlp/sk-bench">GitHub</a></nav></header>
   <h1>Ako dobre rozumie umelá inteligencia slovenčine?</h1>
   <p class="lead">sk-bench je prvý veľký súbor testov, ktorý meria, ako umelá inteligencia ovláda slovenčinu. Má 30 testov z desiatich oblastí a väčšina vznikla priamo v slovenčine. Vo vedeckej štúdii sme v nich porovnali 55 modelov.</p>
-  <p>Testy pre ľudí, ako je autoškola či maturita, zvládajú najlepšie modely takmer bez chyby. V niektorých slovenských úlohách však ešte zaostávajú.</p>
+  <p>Najlepšie modely odpovedajú na otázky z autoškoly či maturity takmer bez chyby. V niektorých slovenských úlohách však ešte zaostávajú.</p>
 
   <section class="sheet" aria-labelledby="sheet-title">
     <h2 id="sheet-title" style="margin-top:0;font-size:1.25rem">Na koľko otázok model odpovedal správne</h2>
@@ -117,7 +124,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--rule
     </div>
     <div id="rows"></div>
     <div class="axis" id="axis" aria-hidden="true"></div>
-    <p class="small">Os začína na 50 %. Čísla sú zo štúdie. Každú úlohu dostal model v troch slovenských zneniach a uvádzame priemer.</p>
+    <p class="small">Os grafu začína na 50 %. Čísla pochádzajú zo štúdie. Každý model dostal každú úlohu v troch slovenských zneniach a uvádzame priemer jeho výsledkov.</p>
   </section>
 
   <section aria-labelledby="q-title">
@@ -129,8 +136,8 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--rule
   <section aria-labelledby="open-title">
     <h2 id="open-title">Komerčné a otvorené modely</h2>
     <p>Komerčné modely, ako Gemini alebo GPT, bežia len na serveroch svojich výrobcov. Otvorený model si firma, nemocnica či úrad môže stiahnuť a spustiť na vlastnom serveri. V štúdii získal najlepší komerčný model 72,6 bodu zo 100 a najlepší otvorený 60,0 bodu.</p>
-    <p>Veľký rozdiel je vo vedomostiach o Slovensku. Gemini 3.1 Pro odpovedal správne na 94 % otázok o Slovensku, najlepší otvorený model na 69 %. Všetky špičkové otvorené modely pochádzajú zo zahraničia. Ak chceme AI, ktorá dobre rozumie slovenčine a pri ktorej údaje zostanú na Slovensku, potrebujeme otvorené modely, ktoré slovenčinu zvládajú na špičkovej úrovni.</p>
-    <p>Do rebríčka priebežne pridávame nové modely, preto sa čísla v ňom môžu líšiť od štúdie.</p>
+    <p>Veľký rozdiel je vo vedomostiach o Slovensku. Gemini 3.1 Pro odpovedal správne na 94 % otázok o Slovensku, najlepší otvorený model na 69 %. Všetky špičkové otvorené modely pochádzajú zo zahraničia. Ak chceme, aby AI dobre rozumela slovenčine a údaje zostali na Slovensku, potrebujeme otvorené modely, ktoré ovládajú slovenčinu na špičkovej úrovni.</p>
+    <p>Do rebríčka priebežne pridávame výsledky nových modelov, preto sa čísla v rebríčku môžu líšiť od čísel v štúdii.</p>
   </section>
 
   <section aria-labelledby="more-title">
@@ -143,7 +150,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--rule
   </section>
 
   <footer class="small">
-    <p>sk-bench pripravili výskumníci z KInIT, Univerzity Komenského, Technickej univerzity v Košiciach a ďalších partnerov. Kontakt pre médiá: [doplniť].</p>
+    <p>sk-bench pripravili výskumníci z KInIT, Univerzity Komenského, Technickej univerzity v Košiciach a ďalších partnerov.</p>
     <p>Otázky pochádzajú z dátových sád <a href="https://huggingface.co/datasets/slovak-nlp/driving-test-dataset-slovak">driving-test-dataset-slovak</a> (CC BY 4.0), <a href="https://huggingface.co/datasets/TUKE-KEMT/slovak-financial-exam">slovak-financial-exam</a> od TUKE KEMT (CC BY-SA 4.0) a <a href="https://huggingface.co/datasets/slovak-nlp/slovak-school-exams-test-preprocessed">slovak-school-exams</a> (CC BY 4.0). Stav k 3. 11. 2026.</p>
   </footer>
 </main>
