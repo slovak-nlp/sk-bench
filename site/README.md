@@ -16,6 +16,11 @@ down are for researchers.
 - `snapshot_leaderboard.py` regenerates `data/leaderboard.json` from the
   aggregated results in the private `slovak-nlp/sk-bench-results` repo,
   using the same functions as the paper tables
+- `og_card.py` renders the social share cards `og/og-sk.png` and
+  `og/og-en.png` (1200x630, used for `og:image` and `twitter:image`) and
+  `og/apple-touch-icon.png` from `og/favicon.svg`. The PNGs are committed,
+  re-run it on macOS with Chrome and `rsvg-convert` when the headline
+  numbers change
 - `dist/` is the build output. It is not committed on `main`, it is what
   gets copied to the `gh-pages` branch
 

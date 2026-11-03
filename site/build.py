@@ -183,12 +183,14 @@ T = {
     "sk": dict(
         lang="sk", other="en", other_href="en/", other_label="English", root="",
         title="Ako dobre rozumie umelá inteligencia slovenčine? | sk-bench",
-        description="sk-bench meria, ako jazykové modely ovládajú slovenčinu. Porovnali sme 55 modelov na 30 dátových sadách, od otázok z autoškoly, skúšky NBS a maturity až po úlohy, v ktorých AI ešte zaostáva.",
+        description="sk-bench meria, ako jazykové modely ovládajú slovenčinu. Porovnali sme 55 modelov na 30 dátových sadách, od autoškoly a maturity po úlohy, v ktorých AI zaostáva.",
         short="Ako dobre rozumie AI slovenčine",
         nav=[("prehlad", "Prehľad"), ("vyskusajte", "Vyskúšajte"), ("zistenia", "Zistenia"), ("rebricek", "Rebríček"),
              ("ulohy", "Úlohy"), ("metodika", "Metodika"), ("media", "Pre médiá"), ("citovat", "Citovať")],
         theme="Prepnúť medzi svetlým a tmavým režimom",
         h1="Ako dobre rozumie umelá inteligencia slovenčine?",
+        og_locale="sk_SK",
+        og_alt="sk-bench: Ako dobre rozumie umelá inteligencia slovenčine? Najlepší komerčný model Gemini 3.1 Pro získal 72,6 bodu zo 100, najlepší model s otvorenými váhami gpt-oss 120B 60,0 bodu.",
         subtitle="sk-bench: súbor testov na hodnotenie veľkých jazykových modelov v slovenčine",
         corr="Korešpondenčný autor",
         btn_paper="Prečítať štúdiu", btn_board="Pozrieť rebríček", btn_code="Kód a dáta", btn_cite="Citovať",
@@ -303,12 +305,14 @@ T = {
     "en": dict(
         lang="en", other="sk", other_href="../", other_label="Slovensky", root="../",
         title="How well does AI understand Slovak? | sk-bench",
-        description="sk-bench measures how well language models handle Slovak. We tested 55 models on 30 datasets, from driving-test, NBS exam and maturita questions to the tasks where AI still falls short.",
+        description="sk-bench measures how well language models handle Slovak. We tested 55 models on 30 datasets, from driving tests and school exams to tasks where AI falls short.",
         short="How well does AI understand Slovak",
         nav=[("overview", "Overview"), ("try", "Try it"), ("findings", "Findings"), ("leaderboard", "Leaderboard"),
              ("tasks", "Tasks"), ("method", "Method"), ("press", "Press"), ("cite", "Cite")],
         theme="Switch between light and dark mode",
         h1="How well does AI understand Slovak?",
+        og_locale="en_US",
+        og_alt="sk-bench: How well does AI understand Slovak? The best commercial model, Gemini 3.1 Pro, scored 72.6 out of 100. The best open model, gpt-oss 120B, scored 60.0.",
         subtitle="sk-bench: A Native-First Benchmark for Evaluating Large Language Models in Slovak",
         corr="Corresponding author",
         btn_paper="Read the paper", btn_board="See the leaderboard", btn_code="Code and data", btn_cite="Cite",
@@ -1147,8 +1151,6 @@ THEME_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="1
               '<path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>')
 DOC_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">'
             '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>')
-FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' "
-           "fill='%231F3F68'/%3E%3Cpath d='M8 17l5 5 11-12' stroke='%23fff' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
 PRE_THEME = "try{var t=localStorage.getItem('skb-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}"
 
 
@@ -1161,6 +1163,7 @@ def page(lang: str) -> str:
     nav += f'<a class="lang-sw" href="{t["other_href"]}" hreflang="{t["other"]}" lang="{t["other"]}">{t["other_label"]}</a>'
     ds = [f'<a href="{u}">{e(n)}</a>' for u, n in DATASETS]
     url = SITE_URL + ("en/" if lang == "en" else "")
+    og_img = f"{SITE_URL}og-{lang}.png"
     authors = "".join(f"<li>{e(a)}<sup>{s}</sup></li>" for a, s in AUTHORS)
     affil = "".join(f"<span><sup>{i}</sup>{e(a)}</span>" for i, a in enumerate(AFFIL[lang], 1))
     cards = "".join(f'<article class="ocard card"><p class="big">{e(big)}</p><h3>{e(h)}</h3><p>{e(p)}</p>'
@@ -1190,15 +1193,34 @@ def page(lang: str) -> str:
 <link rel="canonical" href="{url}">
 <link rel="alternate" hreflang="sk" href="{SITE_URL}">
 <link rel="alternate" hreflang="en" href="{SITE_URL}en/">
+<link rel="alternate" hreflang="x-default" href="{SITE_URL}en/">
+<meta name="theme-color" content="#FAF9F6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121418" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="sk-bench">
+<meta property="og:locale" content="{t["og_locale"]}">
+<meta property="og:locale:alternate" content="{T[t["other"]]["og_locale"]}">
 <meta property="og:title" content="{e(t["h1"])}">
 <meta property="og:description" content="{e(t["description"])}">
 <meta property="og:url" content="{url}">
-<meta property="og:type" content="website">
+<meta property="og:image" content="{og_img}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{e(t["og_alt"])}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{e(t["h1"])}">
+<meta name="twitter:description" content="{e(t["description"])}">
+<meta name="twitter:image" content="{og_img}">
+<meta name="twitter:image:alt" content="{e(t["og_alt"])}">
 <meta name="citation_title" content="sk-bench: A Native-First Benchmark for Evaluating Large Language Models in Slovak">
 {"".join(f'<meta name="citation_author" content="{e(a)}">' for a, _ in AUTHORS)}
 <meta name="citation_publication_date" content="2026">
 <meta name="citation_arxiv_id" content="2610.09152">
-<link rel="icon" href="{FAVICON}">
+<meta name="citation_pdf_url" content="https://arxiv.org/pdf/2610.09152">
+<link rel="icon" href="{t["root"]}favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{t["root"]}apple-touch-icon.png">
+<script type="application/ld+json">{json_ld(t, url)}</script>
 <script>{PRE_THEME}</script>
 <style>{CSS}</style>
 </head>
@@ -1303,6 +1325,33 @@ def page(lang: str) -> str:
 """
 
 
+SITEMAP = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+""" + "".join(f"""  <url><loc>{SITE_URL}{p}</loc>
+    <xhtml:link rel="alternate" hreflang="sk" href="{SITE_URL}"/>
+    <xhtml:link rel="alternate" hreflang="en" href="{SITE_URL}en/"/>
+  </url>
+""" for p in ("", "en/")) + "</urlset>\n"
+
+
+def json_ld(t: dict, url: str) -> str:
+    """schema.org data for Google: the paper and the benchmark as a dataset."""
+    people = [{"@type": "Person", "name": a} for a, _ in AUTHORS]
+    data = {"@context": "https://schema.org", "@graph": [
+        {"@type": "ScholarlyArticle", "@id": "https://arxiv.org/abs/2610.09152",
+         "headline": "sk-bench: A Native-First Benchmark for Evaluating Large Language Models in Slovak",
+         "author": people, "datePublished": "2026", "inLanguage": "en",
+         "url": "https://arxiv.org/abs/2610.09152", "sameAs": ["https://arxiv.org/pdf/2610.09152"],
+         "about": {"@id": SITE_URL + "#dataset"}},
+        {"@type": "Dataset", "@id": SITE_URL + "#dataset", "name": "sk-bench",
+         "description": t["description"], "url": url, "inLanguage": "sk", "creator": people,
+         "isAccessibleForFree": True, "keywords": ["Slovak", "large language models", "benchmark", "evaluation"],
+         "sameAs": ["https://github.com/slovak-nlp/sk-bench", "https://huggingface.co/collections/slovak-nlp/sk-bench"],
+         "citation": {"@id": "https://arxiv.org/abs/2610.09152"}},
+    ]}
+    return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
+
+
 def main() -> None:
     if DIST.exists():
         shutil.rmtree(DIST)
@@ -1314,6 +1363,9 @@ def main() -> None:
     shutil.copy(ROOT / "data" / "leaderboard.json", DIST / "data" / "leaderboard.json")
     (DIST / "data" / "sk-bench-leaderboard.csv").write_text(to_csv())
     shutil.copy(ROOT.parent / "images" / "sk-bench-overview.svg", DIST / "sk-bench-overview.svg")
+    for f in ("og-sk.png", "og-en.png", "favicon.svg", "apple-touch-icon.png"):
+        shutil.copy(ROOT / "og" / f, DIST / f)
+    (DIST / "sitemap.xml").write_text(SITEMAP)
     print("built", sorted(str(p.relative_to(DIST)) for p in DIST.rglob("*") if p.is_file()))
 
 
