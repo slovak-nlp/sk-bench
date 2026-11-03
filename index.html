@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sk-bench</title>
+<meta name="description" content="Ako dobre jazykové modely rozumejú slovenčine. Výsledky na autoškole, skúške NBS, maturite a v úlohách, kde AI ešte zaostáva.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #F3F5F7;
+  --sheet: #FFFFFF;
+  --ink: #1B2A41;
+  --muted: #56667A;
+  --rule: #CBD3DC;
+  --pencil: #2B59C3;
+  --pen: #C62F2B;
+  --ok-bg: #E6EEFB;
+  --bad-bg: #FBE9E8;
+  --serif: "Literata", Georgia, serif;
+  --sans: "Public Sans", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131A24; --sheet: #1A2330; --ink: #E4E9F0; --muted: #9AA8B8;
+    --rule: #34414F; --pencil: #7EA2F0; --pen: #F0716B; --ok-bg: #1F2D47; --bad-bg: #3A2222;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131A24; --sheet: #1A2330; --ink: #E4E9F0; --muted: #9AA8B8;
+  --rule: #34414F; --pencil: #7EA2F0; --pen: #F0716B; --ok-bg: #1F2D47; --bad-bg: #3A2222;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 1rem/1.55 var(--sans);
+}
+main { max-width: 46rem; margin: 0 auto; padding: 3rem 1rem 4rem; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 700; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(2rem, 6vw, 2.9rem); letter-spacing: -0.01em; max-width: 18ch; }
+h2 { font-size: 1.6rem; margin-top: 3.5rem; }
+p { margin: 0.8rem 0; max-width: 62ch; }
+a { color: var(--pencil); text-underline-offset: 0.15em; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--pencil); outline-offset: 2px; }
+.lead { font-size: 1.15rem; margin-top: 1.2rem; }
+.small { font-size: 0.875rem; color: var(--muted); }
+
+/* Result sheet */
+.sheet {
+  background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px;
+  padding: 1.25rem 1.25rem 1rem; margin-top: 2rem;
+}
+.legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; font-size: 0.875rem; color: var(--muted); margin-bottom: 0.5rem; }
+.legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.row { padding: 1rem 0 0.9rem; border-top: 1px solid var(--rule); }
+.row:first-of-type { border-top: 0; }
+.row-head { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
+.row-head strong { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; }
+.row-head .top { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.track { position: relative; height: 2.4rem; margin: 0.6rem 0 0.2rem; }
+.track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--rule); }
+.tick { position: absolute; top: 50%; height: 0.5rem; border-left: 1px solid var(--rule); transform: translateY(-50%); }
+.bar-pass { position: absolute; top: 0; bottom: 0; border-left: 2px solid var(--pen); }
+.bar-pass span { position: absolute; right: 0.35rem; top: -0.35rem; font-size: 0.75rem; color: var(--pen); white-space: nowrap; }
+.dot { position: absolute; top: 50%; width: 0.85rem; height: 0.85rem; transform: translate(-50%, -50%); }
+.d-gem { background: var(--ink); border-radius: 50%; }
+.d-gpt { border: 2px solid var(--ink); border-radius: 50%; background: var(--sheet); }
+.d-open { background: var(--pencil); }
+.row .note { font-size: 0.875rem; color: var(--muted); margin: 0; }
+.axis { position: relative; height: 1.2rem; font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.axis span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.axis span:first-child { transform: none; }
+.axis span:last-child { transform: translateX(-100%); }
+.group-label { max-width: none; font-family: var(--serif); font-style: italic; color: var(--muted); margin: 1.4rem 0 0; padding-top: 0.8rem; border-top: 2px solid var(--ink); }
+
+/* Questions */
+.q { background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; padding: 1.1rem 1.25rem; margin-top: 1rem; }
+.q-src { font-size: 0.8rem; color: var(--muted); margin: 0 0 0.4rem; }
+.q h3 { font-size: 1.12rem; font-weight: 600; }
+.q ol { list-style: none; padding: 0; margin: 0.8rem 0 0; display: grid; gap: 0.4rem; }
+.q button {
+  width: 100%; text-align: left; font: inherit; color: var(--ink); cursor: pointer;
+  background: transparent; border: 1px solid var(--rule); border-radius: 3px; padding: 0.55rem 0.7rem;
+  display: flex; gap: 0.6rem; align-items: baseline;
+}
+.q button:hover { border-color: var(--muted); }
+.q button b { font-family: var(--serif); min-width: 1.1rem; }
+.q[data-done] button { cursor: default; }
+.q button.is-right { background: var(--ok-bg); border-color: var(--pencil); }
+.q button.is-wrong { background: var(--bad-bg); border-color: var(--pen); text-decoration: line-through; text-decoration-color: var(--pen); }
+.q .verdict { margin: 0.7rem 0 0; font-size: 0.9rem; min-height: 1.4em; }
+
+ul.links { padding-left: 1.1rem; }
+ul.links li { margin: 0.3rem 0; }
+footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+@media (max-width: 30rem) {
+  .row-head { flex-direction: column; gap: 0.1rem; }
+}
+</style>
+</head>
+<body>
+<main>
+  <h1>Ako dobre rozumie umelá inteligencia slovenčine?</h1>
+  <p class="lead">sk-bench je prvý veľký súbor testov, ktorý meria, ako umelá inteligencia ovláda slovenčinu. Má 30 testov z desiatich oblastí a väčšina vznikla priamo v slovenčine. Vo vedeckej štúdii sme v nich porovnali 55 modelov.</p>
+  <p>Testy pre ľudí, ako je autoškola či maturita, zvládajú najlepšie modely takmer bez chyby. V niektorých slovenských úlohách však ešte zaostávajú.</p>
+
+  <section class="sheet" aria-labelledby="sheet-title">
+    <h2 id="sheet-title" style="margin-top:0;font-size:1.25rem">Na koľko otázok model odpovedal správne</h2>
+    <div class="legend" aria-hidden="true">
+      <span><i class="dot d-gem" style="position:static;transform:none"></i>Gemini 3.1 Pro</span>
+      <span><i class="dot d-gpt" style="position:static;transform:none"></i>GPT-5.5</span>
+      <span><i class="dot d-open" style="position:static;transform:none"></i>najlepší otvorený model</span>
+      <span><i style="display:inline-block;width:2px;height:0.9rem;background:var(--pen)"></i>koľko treba na úspešnú skúšku</span>
+    </div>
+    <div id="rows"></div>
+    <div class="axis" id="axis" aria-hidden="true"></div>
+    <p class="small">Os začína na 50 %. Čísla sú zo štúdie. Každú úlohu dostal model v troch slovenských zneniach a uvádzame priemer.</p>
+  </section>
+
+  <section aria-labelledby="q-title">
+    <h2 id="q-title">Vyskúšajte si otázky</h2>
+    <p>Šesť skutočných otázok z testov. Kliknite na odpoveď, ktorú považujete za správnu.</p>
+    <div id="questions"></div>
+  </section>
+
+  <section aria-labelledby="open-title">
+    <h2 id="open-title">Komerčné a otvorené modely</h2>
+    <p>Komerčné modely, ako Gemini alebo GPT, bežia len na serveroch svojich výrobcov. Otvorený model si firma, nemocnica či úrad môže stiahnuť a spustiť na vlastnom serveri. V štúdii získal najlepší komerčný model 72,6 bodu zo 100 a najlepší otvorený 60,0 bodu.</p>
+    <p>Veľký rozdiel je vo vedomostiach o Slovensku. Gemini 3.1 Pro odpovedal správne na 94 % otázok o Slovensku, najlepší otvorený model na 69 %. Všetky špičkové otvorené modely pochádzajú zo zahraničia. Ak chceme AI, ktorá dobre rozumie slovenčine a pri ktorej údaje zostanú na Slovensku, potrebujeme otvorené modely, ktoré slovenčinu zvládajú na špičkovej úrovni.</p>
+    <p>Do rebríčka priebežne pridávame nové modely, preto sa čísla v ňom môžu líšiť od štúdie.</p>
+  </section>
+
+  <section aria-labelledby="more-title">
+    <h2 id="more-title">Viac informácií</h2>
+    <ul class="links">
+      <li><a href="https://arxiv.org/abs/2610.09152">Vedecká štúdia (EMNLP 2026)</a></li>
+      <li><a href="https://huggingface.co/spaces/slovak-nlp/sk-bench-leaderboard">Rebríček modelov</a></li>
+      <li><a href="https://github.com/slovak-nlp/sk-bench">Kód a dáta</a></li>
+    </ul>
+  </section>
+
+  <footer class="small">
+    <p>sk-bench pripravili výskumníci z KInIT, Univerzity Komenského, Technickej univerzity v Košiciach a ďalších partnerov. Kontakt pre médiá: [doplniť].</p>
+    <p>Otázky pochádzajú z dátových sád <a href="https://huggingface.co/datasets/slovak-nlp/driving-test-dataset-slovak">driving-test-dataset-slovak</a> (CC BY 4.0), <a href="https://huggingface.co/datasets/TUKE-KEMT/slovak-financial-exam">slovak-financial-exam</a> od TUKE KEMT (CC BY-SA 4.0) a <a href="https://huggingface.co/datasets/slovak-nlp/slovak-school-exams-test-preprocessed">slovak-school-exams</a> (CC BY 4.0). Stav k 3. 11. 2026.</p>
+  </footer>
+</main>
+
+<script>
+const MIN = 50;
+const pos = v => ((v - MIN) / (100 - MIN) * 100).toFixed(2) + '%';
+const fmt = v => v.toLocaleString('sk-SK', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %';
+
+const rows = [
+  { name: 'Autoškola', n: '701 otázok', gem: 98.3, gpt: 96.1, open: 89.9, openName: 'Gemma 4 31B', pass: 90, passLabel: 'na vodičák treba 90 zo 100 bodov' },
+  { name: 'Odborná finančná skúška NBS', n: '1 334 otázok', gem: 96.3, gpt: 96.0, open: 87.8, openName: 'Qwen3.5 397B', pass: 80, passLabel: 'na skúšku treba 24 z 30' },
+  { name: 'Maturita zo slovenčiny', n: '369 testových otázok', gem: 94.8, gpt: 92.9, open: 86.5, openName: 'Gemma 4 31B' },
+  { group: 'Kde AI ešte zaostáva' },
+  { name: 'Otázky o Slovensku', n: 'reálie, história, kultúra', gem: 94.3, gpt: 92.4, open: 68.7, openName: 'Qwen3.5 397B' },
+  { name: 'Chyby v pravopise a diakritike', n: 'model má povedať, či je veta bez chýb', gem: 74.4, gpt: 74.5, open: 72.2, openName: 'Qwen3.5 397B', note: 'Najlepší výsledok spomedzi všetkých modelov je 75,0 %.' },
+];
+
+const rowsEl = document.getElementById('rows');
+for (const r of rows) {
+  if (r.group) {
+    const p = document.createElement('p');
+    p.className = 'group-label'; p.textContent = r.group;
+    rowsEl.append(p); continue;
+  }
+  const top = Math.max(r.gem, r.gpt);
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.innerHTML = `
+    <div class="row-head"><strong>${r.name}</strong><span class="top">najlepší model ${fmt(top)}</span></div>
+    <div class="track" role="img" aria-label="${r.name}: Gemini 3.1 Pro ${fmt(r.gem)}, GPT-5.5 ${fmt(r.gpt)}, najlepší otvorený model ${r.openName} ${fmt(r.open)}${r.pass ? ', na úspešnú skúšku treba ' + r.pass + ' %' : ''}">
+      ${[60,70,80,90].map(t => `<i class="tick" style="left:${pos(t)}"></i>`).join('')}
+      ${r.pass ? `<i class="bar-pass" style="left:${pos(r.pass)}"><span>${r.passLabel}</span></i>` : ''}
+      <i class="dot d-open" style="left:${pos(r.open)}"></i>
+      <i class="dot d-gpt" style="left:${pos(r.gpt)}"></i>
+      <i class="dot d-gem" style="left:${pos(r.gem)}"></i>
+    </div>
+    <p class="note">${r.n}. Najlepší otvorený model: ${r.openName}, ${fmt(r.open)}.${r.note ? ' ' + r.note : ''}</p>`;
+  rowsEl.append(div);
+}
+document.getElementById('axis').innerHTML = [50,60,70,80,90,100]
+  .map(t => `<span style="left:${pos(t)}">${t} %</span>`).join('');
+
+const questions = [
+  { src: 'Autoškola', top: 'Najlepší model odpovedá správne na 98,3 % otázok z autoškoly.',
+    q: 'Musí byť vozidlo stojace za zníženej viditeľnosti na parkovisku osvetlené?',
+    opts: ['Áno, vždy musí byť osvetlené aspoň parkovacími svietidlami.', 'Nie, nemusí byť osvetlené.', 'Áno, ale len ak parkovisko nie je verejne osvetlené.'], a: 1 },
+  { src: 'Autoškola', top: 'Najlepší model odpovedá správne na 98,3 % otázok z autoškoly.',
+    q: 'Pri uzatvorenom chladiacom systéme chladiaca kvapalina vrie',
+    opts: ['približne pri 110 °C.', 'presne pri 100 °C.', 'až pri 150 °C.'], a: 0 },
+  { src: 'Finančná skúška NBS', top: 'Najlepší model odpovedá správne na 96,3 % otázok z finančných skúšok.',
+    q: 'K nadobudnutiu vlastníckeho práva k nehnuteľnosti dochádza',
+    opts: ['nadobudnutím platnosti kúpnej alebo inej zmluvy', 'vkladom do katastra nehnuteľností podľa osobitného predpisu', 'podpisom kúpnej alebo inej zmluvy', 'podpisom kúpnej alebo inej zmluvy s overením podpisov kupujúceho aj predávajúceho pred notárom', 'spísaním notárskej zápisnice o zmluve o prevode nehnuteľnosti'], a: 1 },
+  { src: 'Finančná skúška NBS', top: 'Najlepší model odpovedá správne na 96,3 % otázok z finančných skúšok.',
+    q: 'Blízkou osobou v priamom rade je',
+    opts: ['bratranec', 'otcov brat', 'druh/družka', 'syn', 'neter'], a: 3 },
+  { src: 'Maturita zo slovenčiny, 2024', top: 'Najlepší model odpovedá správne na 94,8 % maturitných testových otázok.',
+    q: 'Taliančina patrí do rovnakej jazykovej skupiny indoeurópskych jazykov ako',
+    opts: ['dánčina.', 'nemčina.', 'rumunčina.', 'bulharčina.'], a: 2 },
+  { src: 'Maturita zo slovenčiny, 2024', top: 'Najlepší model odpovedá správne na 94,8 % maturitných testových otázok.',
+    q: 'V ktorej možnosti sa nachádza vokalizovaná predložka?',
+    opts: ['za kladné vybavenie', 'na osobnom pohovore', 'dorozumiem sa aj po maďarsky', 'skúsenosti so spoluorganizovaním'], a: 3 },
+];
+
+const letters = 'abcde';
+const qEl = document.getElementById('questions');
+questions.forEach((x, qi) => {
+  const box = document.createElement('article');
+  box.className = 'q';
+  box.innerHTML = `<p class="q-src">${x.src}</p><h3>${x.q}</h3>
+    <ol>${x.opts.map((o, i) => `<li><button type="button" data-i="${i}"><b>${letters[i]})</b><span>${o}</span></button></li>`).join('')}</ol>
+    <p class="verdict" aria-live="polite"></p>`;
+  box.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn || box.dataset.done) return;
+    box.dataset.done = '1';
+    const i = +btn.dataset.i;
+    const buttons = box.querySelectorAll('button');
+    buttons[x.a].classList.add('is-right');
+    if (i !== x.a) btn.classList.add('is-wrong');
+    buttons.forEach(b => b.setAttribute('aria-disabled', 'true'));
+    box.querySelector('.verdict').textContent =
+      (i === x.a ? 'Správne. ' : `Správna odpoveď je ${letters[x.a]}). `) + x.top;
+  });
+  qEl.append(box);
+});
+</script>
+</body>
+</html>
